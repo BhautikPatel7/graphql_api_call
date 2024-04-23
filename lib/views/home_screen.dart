@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                 },
                 gradient:
                     LinearGradient(colors: [Colors.teal, Colors.amber.shade400]),
-                child: Text('See All Comment',style: style,),
+                child: Text('Add New Comment',style: style,),
                             ),
               )
           ],

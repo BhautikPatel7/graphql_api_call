@@ -20,6 +20,7 @@ class _DioClientState extends State<DioClientPost> {
     super.initState();
   }
 
+//Funcation To get All Post Data
   Future<void> getAllPostData() async {
     try {
       final dio = Dio();
@@ -28,14 +29,16 @@ class _DioClientState extends State<DioClientPost> {
       List<dynamic> jsonData = response.data;
       userpost = jsonData.map((user) => UserPost.fromjson(user)).toList();
       isLoading = false;
-      // print(response.statusCode);
-      setState(() {});
-    } on DioException catch (e) {
+        // If Data Is Not Loaded And Get Back Then Prevent To Call Set State Use Mounted
+      if (mounted) {
+        setState(() {});
+      }
+    } on DioException catch (e) {   //Error Handling WIth DioException
       if (e.response?.statusCode == 304) {
-        final snackBar = SnackBar(content: Text('The resource was not modified.'));
+        final snackBar =
+            SnackBar(content: Text('The resource was not modified.'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         // print('The resource was not modified. You can use the cached version.');
-      
       }
       if (e.response?.statusCode == 400) {
         final snackBar = SnackBar(content: Text('Bad request.'));
@@ -51,40 +54,43 @@ class _DioClientState extends State<DioClientPost> {
       if (e.response?.statusCode == 403) {
         // print(
         //     ' The authenticated user is not allowed to access the specified API endpoint.');
-            final snackBar = SnackBar(content: Text('The authenticated user is not allowed to access the specified API'));
+        final snackBar = SnackBar(
+            content: Text(
+                'The authenticated user is not allowed to access the specified API'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       if (e.response?.statusCode == 404) {
         print(' The requested resource does not exist.');
-          final snackBar = SnackBar(content: Text(' The requested resource does not exist.'));
+        final snackBar =
+            SnackBar(content: Text(' The requested resource does not exist.'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       if (e.response?.statusCode == 405) {
         // print(
         //     'Method not allowed. Please check the Allow header for the allowed HTTP methods.');
-            final snackBar = SnackBar(content: Text('Method not allowed.'));
+        final snackBar = SnackBar(content: Text('Method not allowed.'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       if (e.response?.statusCode == 415) {
         // print(
         //     ' Unsupported media type. The requested content type or version number is invalid.');
-            final snackBar = SnackBar(content: Text('Unsupported media type.'));
+        final snackBar = SnackBar(content: Text('Unsupported media type.'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       if (e.response?.statusCode == 422) {
         // print(
         //     'Data validation failed (in response to a POST request, for example). Please check the response body for detailed error messages.');
-            final snackBar = SnackBar(content: Text('Data validation failed'));
+        final snackBar = SnackBar(content: Text('Data validation failed'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       if (e.response?.statusCode == 429) {
         // print(
         //     ' Too many requests. The request was rejected due to rate limiting.');
-            final snackBar = SnackBar(content: Text('Too many requests'));
+        final snackBar = SnackBar(content: Text('Too many requests'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       if (e.response?.statusCode == 500) {
-           final snackBar = SnackBar(content: Text('Internal server error.'));
+        final snackBar = SnackBar(content: Text('Internal server error.'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
 

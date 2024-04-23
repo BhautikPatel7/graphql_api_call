@@ -5,15 +5,14 @@ import 'package:graphql_api_call/Constant/Api_Key.dart';
 import 'package:graphql_api_call/model/comment_response_model.dart';
 import 'package:graphql_api_call/model/post_response_model.dart';
 import 'package:graphql_api_call/network/end_points.dart';
-
-
-
+ 
 class AddCommentToPostWithDio extends StatefulWidget {
   @override
   AddCommentToPostWithDioState createState() => AddCommentToPostWithDioState();
 }
 
 class AddCommentToPostWithDioState extends State<AddCommentToPostWithDio> {
+  //String to Store And Display Response
   String Commentidstr = '';
   String Postidstr = '';
   String namestr = '';
@@ -21,66 +20,69 @@ class AddCommentToPostWithDioState extends State<AddCommentToPostWithDio> {
   String bodystr = '';
   bool isLoading = false;
 
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController postController = TextEditingController();
   final TextEditingController commentController = TextEditingController();
 
+
+// Funcation to Add New Comment
   void addNewComment() async {
     String name = nameController.text;
     String email = emailController.text;
     String post_id = postController.text;
     String body = commentController.text;
-  
-     String p = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-       RegExp regExp = new RegExp(p);
 
-       RegExp nameRegExp = RegExp(r"^[a-zA-Z]+$");
+    String emailRegex =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp emailregExp = new RegExp(emailRegex);
+
+    RegExp nameRegExp = RegExp(r"^[a-zA-Z]+$");
+
+    // basic Client Side Validation
 
     if (name.isEmpty) {
-        final snackBar =
-            SnackBar(content: Text('Plese enter name'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return;
+      final snackBar = SnackBar(content: Text('Plese enter name'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
     }
-       if (!(nameRegExp.hasMatch(name))) {
-        final snackBar =
-            SnackBar(content: Text('name Only Conatins character'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return;
+    if (!(nameRegExp.hasMatch(name))) {
+      final snackBar = SnackBar(content: Text('name Only Conatins character'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
     }
-      if (email.isEmpty) {
-        final snackBar =
-            SnackBar(content: Text('Plese enter  Email'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return;
+    if (email.isEmpty) {
+      final snackBar = SnackBar(content: Text('Plese enter  Email'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
     }
-    if (!(regExp.hasMatch(email))) {
-        final snackBar =
-            SnackBar(content: Text('Plese enter valid  Email'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return;
+    if (!(emailregExp.hasMatch(email))) {
+      final snackBar = SnackBar(content: Text('Plese enter valid  Email'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
     }
-        if (post_id.isEmpty) {
-        final snackBar =
-            SnackBar(content: Text('Plese enter id'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return;
+    if (post_id.isEmpty) {
+      final snackBar = SnackBar(content: Text('Plese enter id'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
     }
-        if (body.isEmpty) {
-        final snackBar =
-            SnackBar(content: Text('Plese enter comment'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return;
+    if (body.isEmpty) {
+      final snackBar = SnackBar(content: Text('Plese enter comment'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
     }
     try {
-      Response response =
-          await Dio().post('${Endpoints.baseURL}${Endpoints.comments}',
-              data: {'name': name, 'email': email, 'post_id': post_id,'body' : body},
-              options: Options(
-                headers: {"authorization": "Bearer ${ApiKey.API_KEY}"},
-              ));
+      Response response = await Dio().post(
+          '${Endpoints.baseURL}${Endpoints.comments}',
+          data: {               //Passing Parameter In The Body Of Post
+            'name': name,
+            'email': email,
+            'post_id': post_id,
+            'body': body
+          },
+          options: Options(
+            headers: {"authorization": "Bearer ${ApiKey.API_KEY}"},   //Passing Authorization Token in Field Header
+          ));
       UserComment newUser = UserComment.fromjson(response.data);
       Commentidstr = newUser.id.toString();
       Postidstr = newUser.post_id.toString();
@@ -88,16 +90,14 @@ class AddCommentToPostWithDioState extends State<AddCommentToPostWithDio> {
       bodystr = newUser.body.toString();
       emailstr = newUser.email.toString();
 
-
       nameController.clear();
       emailController.clear();
       postController.clear();
       commentController.clear();
 
-
       isLoading = true;
-      setState(() {});
-    } on DioException catch (e) { 
+      setState(() {});  
+    } on DioException catch (e) {
       print(e.response);
       if (e.response?.statusCode == 422) {
         final snackBar = SnackBar(content: Text('Enter Valid Post Id'));
@@ -168,11 +168,11 @@ class AddCommentToPostWithDioState extends State<AddCommentToPostWithDio> {
               decoration: InputDecoration(labelText: 'Email'),
             ),
             TextField(
-               keyboardType: TextInputType.number,
+              keyboardType: TextInputType.number,
               controller: postController,
               decoration: InputDecoration(labelText: 'Post_id'),
             ),
-              TextField(
+            TextField(
               controller: commentController,
               decoration: InputDecoration(labelText: 'Comment'),
             ),
@@ -182,46 +182,50 @@ class AddCommentToPostWithDioState extends State<AddCommentToPostWithDio> {
               child: Text('Add Comment to Post'),
             ),
             Expanded(
-              child: isLoading ? ListView(
-                scrollDirection: Axis.horizontal,
-                children: <Widget>[    
-              DataTable(  
-                columns: [  
-                  DataColumn(label: Text(  
-                      ' Comment ID',  
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
-                  )),  
-                  DataColumn(label: Text(  
-                      'Post  ID',  
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
-                  )),  
-                  DataColumn(label: Text(  
-                      'Name',  
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
-                  )), 
-                  DataColumn(label: Text(  
-                      'Email',  
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
-                  )), 
-                  DataColumn(label: Text(  
-                      'Comment',  
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)  
-                  )), 
-                ],  
-                rows: [  
-                  DataRow(cells: [  
-                    DataCell(Text(Commentidstr)),  
-                    DataCell(Text(Postidstr)),  
-                    DataCell(Text(namestr)),  
-                    DataCell(Text(emailstr)),  
-                    DataCell(Text(bodystr)),  
-                  ]),  
-                ],  
-              ),  
-                        ])
-
-            : Text('')
-            )
+                child: isLoading
+                    ? ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                            DataTable(
+                              columns: [
+                                DataColumn(
+                                    label: Text(' Comment ID',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))),
+                                DataColumn(
+                                    label: Text('Post  ID',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))),
+                                DataColumn(
+                                    label: Text('Name',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))),
+                                DataColumn(
+                                    label: Text('Email',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))),
+                                DataColumn(
+                                    label: Text('Comment',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))),
+                              ],
+                              rows: [
+                                DataRow(cells: [
+                                  DataCell(Text(Commentidstr)),
+                                  DataCell(Text(Postidstr)),
+                                  DataCell(Text(namestr)),
+                                  DataCell(Text(emailstr)),
+                                  DataCell(Text(bodystr)),
+                                ]),
+                              ],
+                            ),
+                          ])
+                    : Text(''))
           ],
         ),
       ),
